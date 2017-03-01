@@ -29,7 +29,24 @@ public class InvokeCommandWinRMOperation extends WinRMOperation implements Seria
                                 String hostName, String userName, String password) {
         boolean result = false;
         try {
-            final CommandInterpreter ciUserCommand = new CommandInterpreter(command) {
+            StringBuilder sbCommand = new StringBuilder();
+            sbCommand.append("try");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("{");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append(command);
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("}");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("catch");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("{");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("throw");
+            sbCommand.append(System.lineSeparator());
+            sbCommand.append("}");
+            final String strCommand = sbCommand.toString();
+            final CommandInterpreter ciUserCommand = new CommandInterpreter(strCommand) {
                 @Override
                 public String[] buildCommandLine(FilePath filePath) {
                     return new String[0];
@@ -37,7 +54,7 @@ public class InvokeCommandWinRMOperation extends WinRMOperation implements Seria
 
                 @Override
                 protected String getContents() {
-                    return command;
+                    return strCommand;
                 }
 
                 @Override

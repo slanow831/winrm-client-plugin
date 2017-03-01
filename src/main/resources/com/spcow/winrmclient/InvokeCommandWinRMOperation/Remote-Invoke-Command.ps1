@@ -22,13 +22,21 @@ function Remote-Invoke-Command
 	)
 	process
 	{
-	    Write-Host "Connecting to remote host " $ComputerName "...."
-        $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
-        $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
-        $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject
-        Write-Host "Connected to remote host."
-        Write-Host "Executing commands..."
-        Invoke-Command -Session $Session -FilePath $Path
-        Write-Host "Executing commands finished."
+	    try
+	    {
+            Write-Host "Connecting to remote host " $ComputerName "...."
+            $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
+            $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
+            $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject
+            Write-Host "Connected to remote host."
+            Write-Host "Executing commands..."
+            Invoke-Command -Session $Session -FilePath $Path
+            Write-Host "Executing commands finished."
+        }
+        catch
+        {
+            Write-Host $_.Exception.Message
+            exit 1
+        }
 	}
 }

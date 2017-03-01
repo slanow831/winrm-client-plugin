@@ -27,15 +27,15 @@ function Send-File
 	)
 	process
 	{
-	    Write-Host "Connecting to remote host " $ComputerName "...."
-        $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
-        $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
-        $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -ConfigurationName $ConfigurationValue
-		Write-Host "Connected to remote host."
-		foreach ($p in $Path)
-		{
-			try
-			{
+	    try
+        {
+            Write-Host "Connecting to remote host " $ComputerName "...."
+            $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
+            $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
+            $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -ConfigurationName $ConfigurationValue
+            Write-Host "Connected to remote host."
+            foreach ($p in $Path)
+            {
 				if ($p.StartsWith('\\'))
 				{
 					Write-Host "[$($p)] is a UNC path. Copying locally first"
@@ -116,11 +116,12 @@ function Send-File
 					$streamChunks | Invoke-Command -Session $Session -ScriptBlock $remoteScript
 					Write-Host "WinRM copy of [$($p)] to [$($Destination)] complete"
 				}
-			}
-			catch
-			{
-				Write-Host $_.Exception.Message
-			}
+		    }
 		}
+        catch
+        {
+            Write-Host $_.Exception.Message
+            exit 1
+        }
 	}
 }
