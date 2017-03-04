@@ -1,4 +1,4 @@
-package com.spcow.winrmclient;
+package com.spcow.plugins.winrmclient;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -17,7 +17,7 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
     private final String source;
     private final String destination;
     private final String configurationName;
-    private final String SEND_FILE_PATH = "/com/spcow/winrmclient/SendFileWinRMOperation/Send-File.ps1";
+    private final String SEND_FILE_PATH = "/com/spcow/plugins/winrmclient/SendFileWinRMOperation/Send-File.ps1";
 
     @DataBoundConstructor
     public SendFileWinRMOperation(String source, String destination, String configurationName) {

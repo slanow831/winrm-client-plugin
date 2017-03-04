@@ -1,4 +1,4 @@
-package com.spcow.winrmclient;
+package com.spcow.plugins.winrmclient;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -15,7 +15,7 @@ import java.io.Serializable;
 public class InvokeCommandWinRMOperation extends WinRMOperation implements Serializable {
 
     private final String command;
-    private final String REMOTE_INVOKE_COMMAND_PATH = "/com/spcow/winrmclient/InvokeCommandWinRMOperation/Remote-Invoke-Command.ps1";
+    private final String REMOTE_INVOKE_COMMAND_PATH = "/com/spcow/plugins/winrmclient/InvokeCommandWinRMOperation/Remote-Invoke-Command.ps1";
 
     @DataBoundConstructor
     public InvokeCommandWinRMOperation(String command) {
