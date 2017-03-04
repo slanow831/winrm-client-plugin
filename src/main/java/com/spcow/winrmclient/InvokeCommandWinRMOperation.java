@@ -6,6 +6,7 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.CommandInterpreter;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.xml.transform.stream.StreamSource;
@@ -133,6 +134,7 @@ public class InvokeCommandWinRMOperation extends WinRMOperation implements Seria
     }
 
     @Extension
+    @Symbol("invokeCommand")
     public static class DescriptorImpl extends WinRMOperationDescriptor {
         public String getDisplayName() {
             return "Invoke-Command";
