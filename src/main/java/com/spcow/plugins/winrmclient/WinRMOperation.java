@@ -1,4 +1,4 @@
-package com.spcow.winrmclient;
+package com.spcow.plugins.winrmclient;
 
 import hudson.FilePath;
 import hudson.Launcher;
