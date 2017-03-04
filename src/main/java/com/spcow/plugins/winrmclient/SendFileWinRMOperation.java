@@ -10,6 +10,7 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
 import java.io.Serializable;
 
 public class SendFileWinRMOperation extends WinRMOperation implements Serializable {
@@ -17,7 +18,7 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
     private final String source;
     private final String destination;
     private final String configurationName;
-    private final String SEND_FILE_PATH = "/com/spcow/plugins/winrmclient/SendFileWinRMOperation/Send-File.ps1";
+    private final static String SEND_FILE_PATH = "/com/spcow/plugins/winrmclient/SendFileWinRMOperation/Send-File.ps1";
 
     @DataBoundConstructor
     public SendFileWinRMOperation(String source, String destination, String configurationName) {
@@ -97,13 +98,16 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
 
             };
             FilePath scriptFile = remoteCommandInterpreter.createScriptFile(buildWorkspace);
-            remoteCommandInterpreter.buildCommandLine(scriptFile);
             int exitStatus = launcher.launch().cmds(remoteCommandInterpreter.buildCommandLine(scriptFile)).stdout(listener).join();
             scriptFile.delete();
             fpRemoteSendFile.delete();
             result = didErrorsOccur(exitStatus);
 
-        } catch (Exception e) {
+        } catch (RuntimeException  e) {
+            listener.fatalError(e.getMessage());
+        } catch (InterruptedException e) {
+            listener.fatalError(e.getMessage());
+        } catch (IOException e) {
             listener.fatalError(e.getMessage());
         }
         return result;

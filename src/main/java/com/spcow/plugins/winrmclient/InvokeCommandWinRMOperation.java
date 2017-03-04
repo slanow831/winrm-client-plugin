@@ -10,12 +10,13 @@ import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.xml.transform.stream.StreamSource;
+import java.io.IOException;
 import java.io.Serializable;
 
 public class InvokeCommandWinRMOperation extends WinRMOperation implements Serializable {
 
     private final String command;
-    private final String REMOTE_INVOKE_COMMAND_PATH = "/com/spcow/plugins/winrmclient/InvokeCommandWinRMOperation/Remote-Invoke-Command.ps1";
+    private final static String REMOTE_INVOKE_COMMAND_PATH = "/com/spcow/plugins/winrmclient/InvokeCommandWinRMOperation/Remote-Invoke-Command.ps1";
 
     @DataBoundConstructor
     public InvokeCommandWinRMOperation(String command) {
@@ -113,13 +114,16 @@ public class InvokeCommandWinRMOperation extends WinRMOperation implements Seria
 
             };
             FilePath scriptFile = remoteCommandInterpreter.createScriptFile(buildWorkspace);
-            remoteCommandInterpreter.buildCommandLine(scriptFile);
             int exitStatus = launcher.launch().cmds(remoteCommandInterpreter.buildCommandLine(scriptFile)).stdout(listener).join();
             scriptFile.delete();
             ciUserCommandScriptFile.delete();
             fpRemoteInvokeCommandScriptFile.delete();
             result = didErrorsOccur(exitStatus);
-        } catch (Exception e) {
+        } catch (RuntimeException  e) {
+            listener.fatalError(e.getMessage());
+        } catch (InterruptedException e) {
+            listener.fatalError(e.getMessage());
+        } catch (IOException e) {
             listener.fatalError(e.getMessage());
         }
         return result;
