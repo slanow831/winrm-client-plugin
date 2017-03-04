@@ -6,6 +6,7 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.CommandInterpreter;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import javax.xml.transform.stream.StreamSource;
@@ -117,6 +118,7 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
     }
 
     @Extension
+    @Symbol("sendFile")
     public static class DescriptorImpl extends WinRMOperationDescriptor {
         public String getDisplayName() {
             return "Send-File";
