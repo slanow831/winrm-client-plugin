@@ -23,17 +23,24 @@ function Send-File
         [ValidateNotNullOrEmpty()]
         [string]$Password,
 
-        [string]$ConfigurationValue
+        $session
+
 	)
 	process
 	{
 	    try
-        {
-            Write-Host "Connecting to remote host " $ComputerName "...."
+        {           
             $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
             $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
-            $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -ConfigurationName $ConfigurationValue
-            Write-Host "Connected to remote host."
+            if(!($Session)){
+                Write-Host "Connecting to remote host " $ComputerName "...."
+                $Session_option = New-PSSessionOption -IdleTimeout 60000 
+                $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -SessionOption $Session_option
+                Write-Host "Connected to remote host."
+            }else{
+                Write-Host "Already connected to remote host. Using session $Session"
+            }
+
             foreach ($p in $Path)
             {
 				if ($p.StartsWith('\\'))
@@ -44,6 +51,8 @@ function Send-File
 				}
 				if (Test-Path -Path $p -PathType Container)
 				{
+
+
 					Write-Host $MyInvocation.MyCommand -Message "[$($p)] is a folder. Sending all files"
 					$files = Get-ChildItem -Path $p -File -Recurse
 					$sendFileParamColl = @()
@@ -52,11 +61,14 @@ function Send-File
 						$sendParams = @{
 							'Session' = $Session
 							'Path' = $file.FullName
+                            'ComputerName' = $ComputerName
+                            'Password' = $Password
+                            'UserName' = $UserName
 						}
 						if ($file.DirectoryName -ne $p) ## It's a subdirectory
 						{
 							$subdirpath = $file.DirectoryName.Replace("$p\", '')
-							$sendParams.Destination = "$Destination\$subDirPath"
+							$sendParams.Destination = "$subDirPath"
 						}
 						else
 						{
@@ -66,54 +78,22 @@ function Send-File
 					}
 					foreach ($paramBlock in $sendFileParamColl)
 					{
-						Send-File @paramBlock
+                        Send-File @paramBlock
 					}
+
+
 				}
 				else
 				{
 					Write-Host "Starting WinRM copy of [$($p)] to [$($Destination)]"
 					# Get the source file, and then get its contents
-					$sourceBytes = [System.IO.File]::ReadAllBytes($p);
-					$streamChunks = @();
-
-					# Now break it into chunks to stream.
-					$streamSize = 1MB;
-					for ($position = 0; $position -lt $sourceBytes.Length; $position += $streamSize)
-					{
-						$remaining = $sourceBytes.Length - $position
-						$remaining = [Math]::Min($remaining, $streamSize)
-
-						$nextChunk = New-Object byte[] $remaining
-						[Array]::Copy($sourcebytes, $position, $nextChunk, 0, $remaining)
-						$streamChunks +=, $nextChunk
-					}
-					$remoteScript = {
-						if (-not (Test-Path -Path $using:Destination -PathType Container))
-						{
-							$null = New-Item -Path $using:Destination -Type Directory -Force
-						}
-						$fileDest = "$using:Destination\$($using:p | Split-Path -Leaf)"
-						## Create a new array to hold the file content
-						$destBytes = New-Object byte[] $using:length
-						$position = 0
-
-						## Go through the input, and fill in the new array of file content
-						foreach ($chunk in $input)
-						{
-							[GC]::Collect()
-							[Array]::Copy($chunk, 0, $destBytes, $position, $chunk.Length)
-							$position += $chunk.Length
-						}
-
-						[IO.File]::WriteAllBytes($fileDest, $destBytes)
-
-						Get-Item $fileDest
-						[GC]::Collect()
-					}
-
-					# Stream the chunks into the remote script.
-					$Length = $sourceBytes.Length
-					$streamChunks | Invoke-Command -Session $Session -ScriptBlock $remoteScript
+                    (get-item -path $p).Directory
+                    Invoke-Command -Session $Session -ScriptBlock {
+                        if(!(test-path -path $using:destination)){
+                            New-Item -ItemType Directory -Path $using:destination -Force  
+                        }
+                    }
+                    Copy-Item $p -Destination $Destination -ToSession $Session
 					Write-Host "WinRM copy of [$($p)] to [$($Destination)] complete"
 				}
 		    }
