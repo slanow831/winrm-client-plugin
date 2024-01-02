@@ -6,7 +6,4 @@
     <f:entry title="Destination" field="destination">
         <f:textbox field="destination" />
     </f:entry>
-    <f:entry title="Configuration Name" field="configurationName">
-        <f:textbox field="configurationName" />
-    </f:entry>
 </j:jelly>
