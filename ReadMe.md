@@ -20,4 +20,4 @@ At present following Operations implemented:
         }
     }
 # Jenkins Pipeline example
-    winRMClient credentialsId: '549bdb9b-0d36-4c21-948a-ca0a9ef6575f', hostName: '192.168.1.7', winRMOperations: [invokeCommand('dir'), sendFile(configurationName: 'DataNoLimits', destination: 'C:\\test', source: 'C:\\test.txt')]
+    winRMClient credentialsId: '549bdb9b-0d36-4c21-948a-ca0a9ef6575f', hostName: '192.168.1.7', winRMOperations: [invokeCommand('dir'), sendFile(destination: 'C:\\test', source: 'C:\\test.txt')]
