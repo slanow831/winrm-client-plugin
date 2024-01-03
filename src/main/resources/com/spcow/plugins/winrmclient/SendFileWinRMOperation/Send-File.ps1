@@ -23,7 +23,11 @@ function Send-File
         [ValidateNotNullOrEmpty()]
         [string]$Password,
 
-        $session
+        $session,
+
+        [long]$ttl = 60000,
+
+        [string]$TempPath = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))"
 
 	)
 	process
@@ -34,7 +38,7 @@ function Send-File
             $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
             if(!($Session)){
                 Write-Host "Connecting to remote host " $ComputerName "...."
-                $Session_option = New-PSSessionOption -IdleTimeout 60000 
+                $Session_option = New-PSSessionOption -IdleTimeout $ttl 
                 $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -SessionOption $Session_option
                 Write-Host "Connected to remote host."
             }else{
@@ -45,11 +49,29 @@ function Send-File
             {
 				if ($p.StartsWith('\\'))
 				{
-					Write-Host "[$($p)] is a UNC path. Copying locally first"
-					Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
-					$p = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))\$($p | Split-Path -Leaf)"
-				}
-				if (Test-Path -Path $p -PathType Container)
+					
+					
+					#Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
+					$dest = "$TempPath\$($p | Split-Path -Leaf)"
+
+                    Write-Host "[$($p)] is a UNC path. Copying locally first to $dest"
+
+					New-PSDrive -Name Src_Drive -PSProvider FileSystem -Root $p -Credential $CredentialObject
+					$SrcFiles = "Src_Drive:\"
+
+					Copy-Item $SrcFiles $dest -Recurse -Force
+					Remove-PSDrive Src_Drive
+
+                    $sendParams = @{
+							'Session' = $Session
+							'Path' = $dest
+                            'Destination' = $Destination
+                            'ComputerName' = $ComputerName
+                            'Password' = $Password
+                            'UserName' = $UserName
+						}
+                    Send-File @sendParams
+				}elseif (Test-Path -Path $p -PathType Container)
 				{
 
 
@@ -67,7 +89,7 @@ function Send-File
 						}
 						if ($file.DirectoryName -ne $p) ## It's a subdirectory
 						{
-							$subdirpath = $file.DirectoryName.Replace("$p\", '')
+							$subdirpath = $Destination + '\' + $file.DirectoryName.Replace("$p\", '')
 							$sendParams.Destination = "$subDirPath"
 						}
 						else
@@ -87,7 +109,7 @@ function Send-File
 				{
 					Write-Host "Starting WinRM copy of [$($p)] to [$($Destination)]"
 					# Get the source file, and then get its contents
-                    (get-item -path $p).Directory
+                    #(get-item -path $p).Directory
                     Invoke-Command -Session $Session -ScriptBlock {
                         if(!(test-path -path $using:destination)){
                             New-Item -ItemType Directory -Path $using:destination -Force  
