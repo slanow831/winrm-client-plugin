@@ -20,7 +20,7 @@ public class WinRMClientJobDslContext implements Context {
     }
 
     void sendFile(String source, String destination, String configurationName) {
-        SendFileWinRMOperation sendFileWinRMOperation = new SendFileWinRMOperation(source, destination, configurationName);
+        SendFileWinRMOperation sendFileWinRMOperation = new SendFileWinRMOperation(source, destination, ttl, temppath);
         winRMOperations.add(sendFileWinRMOperation);
     }
 
