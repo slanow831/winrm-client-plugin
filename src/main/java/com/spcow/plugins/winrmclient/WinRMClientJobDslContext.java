@@ -19,7 +19,7 @@ public class WinRMClientJobDslContext implements Context {
         this.credentialsId = credentialsId;
     }
 
-    void sendFile(String source, String destination, String configurationName) {
+    void sendFile(String source, String destination, String ttl, String temppath) {
         SendFileWinRMOperation sendFileWinRMOperation = new SendFileWinRMOperation(source, destination, ttl, temppath);
         winRMOperations.add(sendFileWinRMOperation);
     }
