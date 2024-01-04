@@ -9,8 +9,8 @@
     <relativePath />
   </parent>
   <groupId>com.spcow.plugins</groupId>
-  <artifactId>winrm2-client</artifactId>
-  <version>2.0</version>
+  <artifactId>winrm-client</artifactId>
+  <version>2.01</version>
   <packaging>hpi</packaging>
 
   <properties>
