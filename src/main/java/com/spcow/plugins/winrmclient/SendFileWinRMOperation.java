@@ -19,6 +19,7 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
     private final String destination;
     private final String ttl;
     private final static String SEND_FILE_PATH = "/com/spcow/plugins/winrmclient/SendFileWinRMOperation/Send-File.ps1";
+    private final String temppath;
 
     @DataBoundConstructor
     public SendFileWinRMOperation(String source, String destination, String ttl, String temppath) {
