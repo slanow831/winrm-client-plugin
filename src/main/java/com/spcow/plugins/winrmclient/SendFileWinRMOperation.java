@@ -17,16 +17,14 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
 
     private final String source;
     private final String destination;
-    private final String ttl;
+    private final String configurationName;
     private final static String SEND_FILE_PATH = "/com/spcow/plugins/winrmclient/SendFileWinRMOperation/Send-File.ps1";
-    private final String temppath;
 
     @DataBoundConstructor
-    public SendFileWinRMOperation(String source, String destination, String ttl, String temppath) {
+    public SendFileWinRMOperation(String source, String destination, String configurationName) {
         this.source = source;
         this.destination = destination;
-        this.ttl = ttl;
-        this.temppath = temppath;
+        this.configurationName = configurationName;
     }
 
     public String getSource() {
@@ -37,12 +35,8 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
         return destination;
     }
 
-    public String getttl() {
-        return ttl;
-    }
-
-    public String gettemppath() {
-        return temppath;
+    public String getConfigurationName() {
+        return configurationName;
     }
 
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener,
@@ -82,13 +76,9 @@ public class SendFileWinRMOperation extends WinRMOperation implements Serializab
             sb.append("\"" + userName + "\"");
             sb.append(" ");
             sb.append("\"" + password + "\"");
-            if (ttl != null) {
+            if (configurationName != null) {
                 sb.append(" ");
-                sb.append("\"" + ttl + "\"");
-            }
-            if (temppath != null) {
-                sb.append(" ");
-                sb.append("\"" + temppath + "\"");
+                sb.append("\"" + configurationName + "\"");
             }
             CommandInterpreter remoteCommandInterpreter = new CommandInterpreter(sb.toString()) {
                 @Override
