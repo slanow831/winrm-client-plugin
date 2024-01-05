@@ -56,11 +56,16 @@ function Send-File
 
                     Write-Host "[$($p)] is a UNC path. Copying locally first to $dest"
 
-					New-PSDrive -Name Src_Drive -PSProvider FileSystem -Root $p -Credential $CredentialObject
-					$SrcFiles = "Src_Drive:\"
+					$src_drive_name = 'Src_Drive_' + $(Get-Random -Maximum 100000)	
 
-					Copy-Item $SrcFiles $dest -Recurse -Force
-					Remove-PSDrive Src_Drive
+					New-PSDrive -Name "$src_drive_name" -PSProvider FileSystem -Root $p -Credential $CredentialObject
+					$SrcFiles = "$src_drive_name" + ':\'
+					$logfilePath = $TempPath + '\' + $src_drive_name + '.log'
+					#Copy-Item $SrcFiles $dest -Recurse -Force
+
+					Robocopy $SrcFiles $dest /V /S /MIR /COPYALL /ZB /NP /XO /R:0 /W:0  /LOG+:$logfilePath
+
+					Remove-PSDrive "$src_drive_name"
 
                     $sendParams = @{
 							'Session' = $Session
