@@ -27,7 +27,7 @@ function Send-File
 
         [long]$ttl = 60000,
 
-        [string]$WinTempPath = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))"
+        [string]$WinTempPath = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))" + '\WorkerFileCache'
 
 	)
 	process
@@ -50,7 +50,9 @@ function Send-File
 				if ($p.StartsWith('\\'))
 				{
 					
-					
+					if(!(test-path -path $WinTempPath)){
+                        New-Item -ItemType Directory -Path $WinTempPath -Force  
+                    }
 					#Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
 					$dest = "$WinTempPath\$($p | Split-Path -Leaf)"
 
@@ -58,14 +60,22 @@ function Send-File
 
 					$src_drive_name = 'Src_Drive_' + $(Get-Random -Maximum 100000)	
 
-					New-PSDrive -Name "$src_drive_name" -PSProvider FileSystem -Root $p -Credential $CredentialObject
-					$SrcFiles = "$src_drive_name" + ':\'
+					$src_drive = New-PSDrive -Name $src_drive_name -PSProvider FileSystem -Root $p -Credential $CredentialObject
+
+                    Write-Host "UNC path [$($src_drive.root)] is now monunted as [$($src_drive.name)]" 
+
 					$logfilePath = $WinTempPath + '\' + $src_drive_name + '.log'
-					#Copy-Item $SrcFiles $dest -Recurse -Force
+                    
+                    $SrcFiles = $src_drive_name + ':\'
+                    Set-Location $SrcFiles
 
-					Robocopy $SrcFiles $dest /V /S /MIR /COPYALL /ZB /NP /XO /R:0 /W:0  /LOG+:$logfilePath
+					Robocopy . *.* $dest /V /S /MIR /COPYALL /ZB /NP /R:0 /W:0 /LOG+:$logfilePath
 
-					Remove-PSDrive "$src_drive_name"
+                    Write-Host "Logfile [$($logfilePath)] has been created" 
+
+                    Set-Location $WinTempPath
+
+					Remove-PSDrive $src_drive_name
 
                     $sendParams = @{
 							'Session' = $Session
