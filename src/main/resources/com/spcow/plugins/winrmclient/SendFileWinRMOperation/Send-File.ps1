@@ -27,7 +27,7 @@ function Send-File
 
         [long]$ttl = 60000,
 
-        [string]$TempPath = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))"
+        [string]$WinTempPath = "$([environment]::GetEnvironmentVariable('TEMP', 'Machine'))"
 
 	)
 	process
@@ -52,7 +52,7 @@ function Send-File
 					
 					
 					#Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
-					$dest = "$TempPath\$($p | Split-Path -Leaf)"
+					$dest = "$WinTempPath\$($p | Split-Path -Leaf)"
 
                     Write-Host "[$($p)] is a UNC path. Copying locally first to $dest"
 
@@ -60,7 +60,7 @@ function Send-File
 
 					New-PSDrive -Name "$src_drive_name" -PSProvider FileSystem -Root $p -Credential $CredentialObject
 					$SrcFiles = "$src_drive_name" + ':\'
-					$logfilePath = $TempPath + '\' + $src_drive_name + '.log'
+					$logfilePath = $WinTempPath + '\' + $src_drive_name + '.log'
 					#Copy-Item $SrcFiles $dest -Recurse -Force
 
 					Robocopy $SrcFiles $dest /V /S /MIR /COPYALL /ZB /NP /XO /R:0 /W:0  /LOG+:$logfilePath
