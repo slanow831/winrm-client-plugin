@@ -49,7 +49,7 @@ function Send-File
 				{
 					
 					if(!(test-path -path $WinTempPath)){
-                        New-Item -ItemType Directory -Path $WinTempPath -Force  
+                        New-Item -ItemType Directory -Path $WinTempPath -Force | Out-Null
                     }
 					#Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
 					$dest = "$WinTempPath\$($p | Split-Path -Leaf)"
