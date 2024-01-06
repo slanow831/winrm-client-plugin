@@ -103,7 +103,7 @@ function Send-File
                     #(get-item -path $p).Directory
                     Invoke-Command -Session $Session -ScriptBlock {
                         if(!(test-path -path $using:destination)){
-                            New-Item -ItemType Directory -Path $using:destination -Force  
+                            New-Item -ItemType Directory -Path $using:destination -Force | Out-Null  
                         }
                     }
                     Copy-Item $p -Destination $Destination -ToSession $Session
