@@ -10,7 +10,7 @@
   </parent>
   <groupId>com.spcow.plugins</groupId>
   <artifactId>winrm-client</artifactId>
-  <version>2.5</version>
+  <version>2.6</version>
   <packaging>hpi</packaging>
 
   <properties>
@@ -31,9 +31,9 @@
 
   <developers>
     <developer>
-      <id>slanow831</id>
-      <name>Slawomir Nowak</name>
-      <email>s.nowak3@outlook.com</email>
+      <id>pskumar448</id>
+      <name>Suresh Kumar</name>
+      <email>pskumar448@gmail.com</email>
     </developer>
   </developers>
 
