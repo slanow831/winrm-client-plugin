@@ -89,36 +89,14 @@ function Send-File
 				}elseif (Test-Path -Path $p -PathType Container)
 				{
 
-
 					Write-Host $MyInvocation.MyCommand -Message "[$($p)] is a folder. Sending all files"
-					$files = Get-ChildItem -Path $p -File -Recurse
-					$sendFileParamColl = @()
-					foreach ($file in $Files)
-					{
-						$sendParams = @{
-							'Session' = $Session
-							'Path' = $file.FullName
-                            'ComputerName' = $ComputerName
-                            'Password' = $Password
-                            'UserName' = $UserName
-						}
-						if ($file.DirectoryName -ne $p) ## It's a subdirectory
-						{
-							$subdirpath = $Destination + '\' + $file.DirectoryName.Replace("$p\", '')
-							$sendParams.Destination = "$subDirPath"
-						}
-						else
-						{
-							$sendParams.Destination = $Destination
-						}
-						$sendFileParamColl += $sendParams
-					}
-					foreach ($paramBlock in $sendFileParamColl)
-					{
-                        Send-File @paramBlock
-					}
-
-
+                    Invoke-Command -Session $Session -ScriptBlock {
+                        if(!(test-path -path $using:destination)){
+                            New-Item -ItemType Directory -Path $using:destination -Force  
+                        }
+                    }
+					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse
+					Write-Host "WinRM dircopy of [$($p)] to [$($Destination)] complete"
 				}
 				else
 				{
@@ -131,7 +109,7 @@ function Send-File
                         }
                     }
                     Copy-Item $p -Destination $Destination -ToSession $Session
-					Write-Host "WinRM copy of [$($p)] to [$($Destination)] complete"
+					Write-Host "WinRM filecopy of [$($p)] to [$($Destination)] complete"
 				}
 		    }
 		}
