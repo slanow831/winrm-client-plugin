@@ -95,7 +95,7 @@ function Send-File
                             New-Item -ItemType Directory -Path $using:destination -Force | Out-Null
                         }
                     }
-					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse
+					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse -Force
 					Write-Host "WinRM dircopy of [$($p)] to [$($Destination)] complete"
 				}
 				else
