@@ -23,6 +23,8 @@ function Send-File
         [ValidateNotNullOrEmpty()]
         [string]$Password,
 
+        [string]$ConfigurationValue,
+
         $session,
 
         [long]$ttl = 60000,
