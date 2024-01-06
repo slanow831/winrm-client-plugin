@@ -89,7 +89,7 @@ function Send-File
 				}elseif (Test-Path -Path $p -PathType Container)
 				{
 
-					Write-Host "[$($p)] is a folder. Sending all files..."
+					Write-Host "[$($p)] is a folder. Sending all files to [$($Destination)]"
                     Invoke-Command -Session $Session -ScriptBlock {
                         if(!(test-path -path $using:destination)){
                             New-Item -ItemType Directory -Path $using:destination -Force | Out-Null
