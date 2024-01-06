@@ -41,8 +41,6 @@ function Send-File
                 $Session_option = New-PSSessionOption -IdleTimeout $ttl 
                 $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject -SessionOption $Session_option
                 Write-Host "Connected to remote host."
-            }else{
-                Write-Host "Already connected to remote host. Using session $Session"
             }
 
             foreach ($p in $Path)
@@ -69,7 +67,7 @@ function Send-File
                     $SrcFiles = $src_drive_name + ':\'
                     Set-Location $SrcFiles
 
-					Robocopy . *.* $dest /V /S /MIR /COPYALL /ZB /NP /R:0 /W:0 /LOG+:$logfilePath
+					Robocopy . *.* $dest /V /S /MIR /COPYALL /ZB /NP /R:0 /W:0 /LOG+:$logfilePath | Out-Null
 
                     Write-Host "Logfile [$($logfilePath)] has been created" 
 
@@ -89,10 +87,10 @@ function Send-File
 				}elseif (Test-Path -Path $p -PathType Container)
 				{
 
-					Write-Host $MyInvocation.MyCommand -Message "[$($p)] is a folder. Sending all files"
+					Write-Host "[$($p)] is a folder. Sending all files..."
                     Invoke-Command -Session $Session -ScriptBlock {
                         if(!(test-path -path $using:destination)){
-                            New-Item -ItemType Directory -Path $using:destination -Force  
+                            New-Item -ItemType Directory -Path $using:destination -Force | Out-Null
                         }
                     }
 					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse
