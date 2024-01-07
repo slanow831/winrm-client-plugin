@@ -96,7 +96,7 @@ function Send-File
 				{
 					Write-Host "Starting WinRM copy of [$($p)] to [$($Destination)]"
 					# Get the source file, and then get its contents
-                    #(get-item -path $p).Directory
+                    
                     Invoke-Command -Session $Session -ScriptBlock {
                         if(!(test-path -path $using:destination)){
                             New-Item -ItemType Directory -Path $using:destination -Force | Out-Null  
