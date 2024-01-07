@@ -53,13 +53,12 @@ function Send-File
 					if(!(test-path -path $WinTempPath)){
                         New-Item -ItemType Directory -Path $WinTempPath -Force | Out-Null
                     }
-					#Copy-Item -Path $p -Destination ([environment]::GetEnvironmentVariable('TEMP', 'Machine'))
+					
 					$dest = "$WinTempPath\$($p | Split-Path -Leaf)"
 
                     Write-Host "[$($p)] is a UNC path. Copying locally first to $dest"
 
 					$src_drive_name = 'Src_Drive_' + $(Get-Random -Maximum 100000)	
-
 					$src_drive = New-PSDrive -Name $src_drive_name -PSProvider FileSystem -Root $p -Credential $CredentialObject
 
                     Write-Host "UNC path [$($src_drive.root)] is now monunted as [$($src_drive.name)]" 
@@ -90,11 +89,6 @@ function Send-File
 				{
 
 					Write-Host "[$($p)] is a folder. Sending all files to [$($Destination)]"
-                    Invoke-Command -Session $Session -ScriptBlock {
-                        if(!(test-path -path $using:destination)){
-                            New-Item -ItemType Directory -Path $using:destination -Force | Out-Null
-                        }
-                    }
 					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse -Force
 					Write-Host "WinRM dircopy of [$($p)] to [$($Destination)] complete"
 				}
