@@ -73,7 +73,7 @@ function Send-File
 
 					Robocopy . *.* $dest /V /S /MIR /COPYALL /ZB /NP /R:0 /W:0 /LOG+:$logfilePath | Out-Null
 
-                    Write-Host "Logfile [$($logfilePath)] has been created" 
+                    Write-Host "Robocopy logfile [$($logfilePath)] has been created" 
 
                     Set-Location $WinTempPath
 
@@ -93,11 +93,11 @@ function Send-File
 
 					Write-Host "[$($p)] is a folder. Sending all files to [$($Destination)]"
 					Copy-Item $p -Destination $Destination -ToSession $Session -Recurse -Force
-					Write-Host "WinRM dircopy of [$($p)] to [$($Destination)] complete"
+					Write-Host "WinRM directory copy of [$($p)] to [$($Destination)] complete"
 				}
 				else
 				{
-					Write-Host "Starting WinRM copy of [$($p)] to [$($Destination)]"
+					Write-Host "Starting WinRM file copy of [$($p)] to [$($Destination)]"
 					# Get the source file, and then get its contents
                     
                     Invoke-Command -Session $Session -ScriptBlock {
@@ -106,7 +106,7 @@ function Send-File
                         }
                     }
                     Copy-Item $p -Destination $Destination -ToSession $Session
-					Write-Host "WinRM filecopy of [$($p)] to [$($Destination)] complete"
+					Write-Host "WinRM file copy of [$($p)] to [$($Destination)] complete"
 				}
 		    }
 		}
