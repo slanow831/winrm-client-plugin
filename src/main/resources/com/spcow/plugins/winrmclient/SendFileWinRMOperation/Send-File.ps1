@@ -36,6 +36,9 @@ function Send-File
 	{
 	    try
         {           
+            if($ConfigurationValue){
+            Write-Host "ConfigurationValue parameter has been depricated and will be ignored"
+            }
             $SecretDetailsFormatted = ConvertTo-SecureString -AsPlainText -Force -String $Password
             $CredentialObject = New-Object -typename System.Management.Automation.PSCredential -argumentlist $UserName, $SecretDetailsFormatted
             if(!($Session)){
