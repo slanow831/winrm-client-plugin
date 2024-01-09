@@ -30,8 +30,9 @@ function Remote-Invoke-Command
             $Session = New-PSSession -ComputerName $ComputerName -Credential $CredentialObject
             Write-Host "Connected to remote host."
             Write-Host "Executing commands..."
-            Invoke-Command -Session $Session -FilePath $Path
-            exit $LASTEXITCODE
+            $res = Invoke-Command -Session $Session -FilePath $Path
+            return $res
+            exit
             Write-Host "Executing commands finished."
         }
         catch
