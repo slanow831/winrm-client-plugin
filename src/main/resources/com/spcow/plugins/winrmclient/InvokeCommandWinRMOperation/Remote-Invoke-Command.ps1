@@ -31,7 +31,7 @@ function Remote-Invoke-Command
             Write-Host "Connected to remote host."
             Write-Host "Executing commands..."
             $res = Invoke-Command -Session $Session -FilePath $Path
-            exit $res
+            return $res
             Write-Host "Executing commands finished."
         }
         catch
